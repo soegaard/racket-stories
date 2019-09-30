@@ -16,9 +16,11 @@
     [(macosx windows) (development)]
     [(unix)           (cond
                         [(regexp-match #rx"web-rs" (gethostname))
-                         (if (file-exists? "PRODUCTION")
-                             (production)
-                             (staging))]
+                         (match (getenv "HOME")
+                           [#f   (staging)]
+                           [home (if (file-exists? (build-path home "PRODUCTION"))
+                                     (production)
+                                     (staging))])]
                         [else
                          (development)])]
     [else             (development)]))

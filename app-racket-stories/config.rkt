@@ -33,7 +33,6 @@
 (require racket/format racket/match racket/runtime-path
          "deployment.rkt" "parameters.rkt" "secret.rkt" "structs.rkt")
 
-
 ;;; Sqlite
 
 (define-runtime-path sqlite-db "../dbs/racket-stories-sqlite.db")
@@ -42,7 +41,7 @@
 
 ;;; Postgresql
 
-(define database-name
+(define (database-name)
   (match the-deployment
     [(development) "racket-stories-development"]
     [(testing)     "racket-stories-testing"]
@@ -70,5 +69,5 @@
 
 (define (database-port)
   (match the-deployment
-    [(or (staging) (production))  (string->number (bytes->string/utf-8 (decrypt "7c438277fc")))]
+    [(or (staging) (production))  (string->number (decrypt "7c438277fc"))]
     [(or (development) (testing)) 5432]))

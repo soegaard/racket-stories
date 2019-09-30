@@ -45,6 +45,11 @@
 
 ; aes-decrypt : string -> string
 (define (aes-decrypt crypto-text)
+  (bytes->string/utf-8
+   (aes-decrypt-bytes crypto-text)))
+
+; aes-decrypt-bytes : string -> bytes
+(define (aes-decrypt-bytes crypto-text)
   (decrypt aes-cipher-specifier key iv
            (hex-string->bytes crypto-text)))
 
@@ -87,10 +92,10 @@
 ; See 
 
 (define github-client-id
-  (aes-decrypt "2b158374fc518e1d41e40cca7ba5de867589c7d5"))
+  (aes-decrypt-bytes "2b158374fc518e1d41e40cca7ba5de867589c7d5"))
 
 (define github-client-secret
-  (aes-decrypt
+  (aes-decrypt-bytes
    "7e44d624f9048f4812b254c82bf3818075dc95d568c15cd32e38769426914e82b58d49d02db3cf21"))
 
 

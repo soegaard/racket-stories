@@ -184,7 +184,7 @@
   (def e (insert-entry
           (create-entry #:title title
                         #:url url
-                        #:score 10
+                        #:score 1
                         #:submitter (user-id u)
                         #:submitter-name (user-username u))))
   (insert-vote (create-vote (user-id u) (entry-id e) ip)))

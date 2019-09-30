@@ -108,7 +108,6 @@
 (define racket-logo               "/static/color-racket-logo.png")
 (define white-racket-logo         "/static/white-racket-logo.png")
 (define white-logo-racket-stories "/static/white-logo-racket-stories.svg")
-(define bootstrap-social          "/static/bootstrap-social-gh-pages/bootstrap-social.css")
 
 ;;;
 ;;; STYLING
@@ -312,7 +311,6 @@
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" 
           crossorigin="anonymous">
-    <link rel="stylesheet" href=@|bootstrap-social| type="text/css">
      
     <!-- Favicons (site logo in tab bar) -->
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
