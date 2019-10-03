@@ -474,7 +474,7 @@
     [u  (define (register dir)
           (register-vote #:user     u
                          #:entry-id entry-id
-                         #:ip       (request-client-ip req)
+                         #:ip       (request-client-ip req) ; todo : handle proxy
                          #:dir      dir))
         (match direction
           ["up"   (register 'up)]

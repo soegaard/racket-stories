@@ -248,34 +248,7 @@
 ;;; Stylesheet
 ;;;
 
-; border: 1px solid red
-
-(define stylesheet "
-    .mw600px        { max-width: 600px; } 
-    .mb-very-small  { margin-bottom: 0.1rem; }
-    body            { font-size: 1rem; margin: 2rem; }
-    a               { display: inline; }
-    a.from          { color: #212529; }
-    .vote-icon      { font-size: 1.5rem; color: var(--purple); margin-bottom: 0.2rem;}
-    .uppernav       { background-color: var(--purple);}
-    .main_column    { background-color: #f6f6ef; }
-    .col-main       { background-color: #f6f6ef; }
-
-    .entry-row          { vertical-align: middle; }
-      .rank-col         { vertical-align: middle; text-align: right;   font-size: 300%; }
-      .arrow-col        { vertical-align: middle; text-align: center; }
-        form.arrows     { vertical-align: middle; margin: auto;       }
-          .updowngrid   { vertical-align: middle; margin: auto; padding: 0px;  }
-          .updowngrid a { display: grid; }
-      .titlescore-col   { vertical-align: middle; text-align: left; display: inline-grid; padding-right: 0px;}
-        .titlescore     {                         text-align: left; display: inline-grid; margin: auto auto auto 0px;}
-      .submitter-name a { color: black; }
-
-    .updowngrid.hidden {visibility: hidden; }
-
-    .col-github-blue    { background-color: #4078c0; }
-")
-
+; Our stylesheet is in `files-root/static/stylesheet.css`
 
 ;;;
 ;;; HTML Page 
@@ -326,7 +299,7 @@
 
     <!-- Our Stylesheet -->
     <!-- TODO: Put this in an external file -->
-    <style> @|stylesheet| </style>
+    @link-css["/static/stylesheet.css"]
 
     <!-- Google Sign-In (only needed on login page) -->
     <!-- Need an authorized domain to test Google Sign-In --> 
