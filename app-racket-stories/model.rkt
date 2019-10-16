@@ -355,7 +355,7 @@
 
 (define (create-user username password email)
   (unless (good-username? username)
-    (error (exn:fail:user:bad (bad-username-reason username)
+    (raise (exn:fail:user:bad (bad-username-reason username)
                               (current-continuation-marks))))
 
   ; TODO create-user : validate email
