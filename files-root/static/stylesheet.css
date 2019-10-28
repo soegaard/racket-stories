@@ -3,6 +3,7 @@
 body            { font-size: 1rem; }
 a               { display: inline; }
 a.from          { color: #212529; }
+a.delete        { color: #212529; }
 .vote-icon      { font-size: 1.5rem; color: var(--purple); margin-bottom: 0.2rem;}
 .uppernav       { background-color: var(--purple);}
 .main_column    { background-color: #f6f6ef; }
@@ -14,6 +15,7 @@ a.from          { color: #212529; }
     form.arrows     { vertical-align: middle; margin: auto;       }
       .updowngrid   { vertical-align: middle; margin: auto; padding: 0px;  }
       .updowngrid a { display: grid; }
+    form.delete     { margin: auto; display: inline-grid;      }
    .titlescore-col   { vertical-align: middle; text-align: left; display: inline-grid; padding-right: 0px;}
      .titlescore     {                         text-align: left; display: inline-grid; margin: auto auto auto 0px;}
    .submitter-name a { color: black; }

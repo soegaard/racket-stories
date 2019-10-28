@@ -207,7 +207,8 @@
    [("vote" "up" (integer-arg) (integer-arg)) #:method "post"  (λ (req e p) (do-vote req "up" e p))]
    ; [("vote" "up" (entry-id-arg) (page-number-arg)) #:method "post"  (λ (reg e p) (do-vote "up" e p))]
    ; [("vote" (vote-direction-arg) (integer-arg) (integer-arg)) #:method "post"  do-vote]
-
+   [("delete" (integer-arg)) #:method "post"      do-delete]
+   
    ; these redirect to other pages (and show a banner at the top)
    [("login-to-vote")                             do-login-to-vote]
    [("login-to-submit")                           do-login-to-submit]
@@ -249,7 +250,7 @@
 (define (do-home req page-number)
   (def first-rank  (+ 1 (* page-number (PAGE-LIMIT))))
   (def entries     (newest page-number)) ; this will like change at some point
-  (def votes      (user-votes-on-newest (current-user) page-number))
+  (def votes       (user-votes-on-newest (current-user) page-number))
   (def result      (html-list-page "home" page-number first-rank entries #:votes votes))
   (response/output (λ (out) (display result out))))
 
@@ -483,6 +484,12 @@
         ; to make sure a reload doesn't resubmit, we redirect to the front page
         (redirect-to (~a "/home/page/" page-number) temporarily)]))
 
+(define (do-delete req entry-id)
+  (match (current-user)
+    [#f (redirect-to "/" temporarily)]
+    [u  (checked-delete-entry (current-user) entry-id)
+        (redirect-to "/" temporarily)]))
+        
 
 (define (do-submit req)
   (match (current-user)

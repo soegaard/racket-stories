@@ -297,7 +297,6 @@
     @script[fontawesome-js]
 
     <!-- Our Stylesheet -->
-    <!-- TODO: Put this in an external file -->
     @link-css["/static/stylesheet.css"]
 
     <!-- Google Sign-In (only needed on login page) -->
@@ -634,7 +633,9 @@
                    ["popular" (~a "/popular/"   period "/page/" next)]
                    [_ (error 'html-list-page "expected home, new or popular.")]))
   (html-page
-   #:title (~a Name "- Racket Stories")
+   #:title (match Name
+             ["Home" "Racket Stories"]
+             [_      (~a "Racket Stories - Name")])
    #:body
    @main-column{
      @(when message (list @br @message @br))
@@ -712,8 +713,11 @@
   
   (define (entry->table-row e rank)
     (defm (struct* entry ([title the-title] [url the-url] [site site] [score the-score] [id id]
-                                            [submitter-name submitter-name])) e)
-    (def  form-name (~a "arrowform" id))
+                          [submitter submitter] [submitter-name submitter-name])) e)
+    (def cu (current-user))
+    (def show-delete? (and cu (equal? (user-id cu) submitter) (young-entry? e)))
+    (def form-name        (~a "arrowform"  id))
+    (def delete-form-name (~a "deleteform" id))
     @div[class: "entry-row row"
           ; hide rank with `d-none` if needed (element is kept to keep size)
           @span[class: @~a{rank-col  col-auto @(if ranking? "" "d-none")}]{ @(or rank "0") }
@@ -721,7 +725,7 @@
           @(when voting?
              @span[class: "arrow-col col-auto row" 
                @form[class: "arrows" name: form-name action: @~a{vote/@id} method: "post"
-                 @input[name: "arrow" type: "hidden"] 
+                  @input[name: "arrow" type: "hidden"] 
                    @span[class: (~a "updowngrid" (if (show-thumbs-up? id)  "" " hidden"))
                      @(html-a-submit form-name (~a "/vote/up/"   id "/" pn) (html-icon 'thumbs-up))
                      #;(html-a-submit form-name (~a "/vote/down/" id "/" pn) (html-icon 'chevron-down))]]])
@@ -730,7 +734,13 @@
               @span[@a[href: the-url]{ @the-title } " (" @a[class: "from" href: (~a "/from/" id)]{@site} ") "]
               @span[class: "score"]{@the-score points by
                      @span[class: "submitter-name"
-                            @a[href: (~a "/user/" submitter-name) ]{ @submitter-name }]}]]])
+                            @a[href: (~a "/user/" submitter-name) ]{ @submitter-name }]
+                     @(when show-delete?
+                        @span[" | "
+                              @span[class: "delete-link"                                     
+                                @form[class: "delete" name: delete-form-name  method: "post"
+                                  @(html-a-submit #:class "delete"
+                                                  delete-form-name (~a "delete/" id) "delete")]]])}]]])
                                                        
   @span[class: "entries container-fluid"]{
     @(entries->rows entries)})

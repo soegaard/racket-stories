@@ -24,6 +24,8 @@
  from-site         ; entries from given site
  url-in-db?        ; is url already in database?
  recent?           ; is the entry less than a month old?
+ young-entry?      ; is the entry less than an hour old? (i.e. deletable)
+ checked-delete-entry
  PAGE-LIMIT
 
  ;; User
@@ -291,6 +293,22 @@
   ; "recent" means within a month
   (def created-at (entry-created-at e))
   (datetime>? created-at (-period (now) (period [months 1]))))
+
+(define (young-entry? e)
+  ; a young entry can be deleted by the submitter
+  (def created-at (entry-created-at e))
+  (datetime>? created-at (-period (now) (period [hours 1]))))
+
+
+(define (checked-delete-entry u entry-id)
+  ; only the submitter can delete an entry, and only if it
+  ; was submitted less than an hour ago
+  (match (get-entry entry-id)
+    [#f  (void)]
+    [e   (when (and (= (user-id u) (entry-submitter e))
+                    (young-entry? e))
+           (delete-one! db e))]))
+  
 
 
 ;;;
