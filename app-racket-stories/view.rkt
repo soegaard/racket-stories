@@ -248,34 +248,7 @@
 ;;; Stylesheet
 ;;;
 
-; border: 1px solid red
-
-(define stylesheet "
-    .mw600px        { max-width: 600px; } 
-    .mb-very-small  { margin-bottom: 0.1rem; }
-    body            { font-size: 1rem; margin: 2rem; }
-    a               { display: inline; }
-    a.from          { color: #212529; }
-    .vote-icon      { font-size: 1.5rem; color: var(--purple); margin-bottom: 0.2rem;}
-    .uppernav       { background-color: var(--purple);}
-    .main_column    { background-color: #f6f6ef; }
-    .col-main       { background-color: #f6f6ef; }
-
-    .entry-row          { vertical-align: middle; }
-      .rank-col         { vertical-align: middle; text-align: right;   font-size: 300%; }
-      .arrow-col        { vertical-align: middle; text-align: center; }
-        form.arrows     { vertical-align: middle; margin: auto;       }
-          .updowngrid   { vertical-align: middle; margin: auto; padding: 0px;  }
-          .updowngrid a { display: grid; }
-      .titlescore-col   { vertical-align: middle; text-align: left; display: inline-grid; padding-right: 0px;}
-        .titlescore     {                         text-align: left; display: inline-grid; margin: auto auto auto 0px;}
-      .submitter-name a { color: black; }
-
-    .updowngrid.hidden {visibility: hidden; }
-
-    .col-github-blue    { background-color: #4078c0; }
-")
-
+; Our stylesheet is in `files-root/static/stylesheet.css`
 
 ;;;
 ;;; HTML Page 
@@ -300,7 +273,6 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="google-signin-client_id" content="racket-stories-1568926163791.apps.googleusercontent.com">
     <!-- The above 3 meta tags *must* come first in the head;
@@ -325,8 +297,7 @@
     @script[fontawesome-js]
 
     <!-- Our Stylesheet -->
-    <!-- TODO: Put this in an external file -->
-    <style> @|stylesheet| </style>
+    @link-css["/static/stylesheet.css"]
 
     <!-- Google Sign-In (only needed on login page) -->
     <!-- Need an authorized domain to test Google Sign-In --> 
@@ -662,7 +633,9 @@
                    ["popular" (~a "/popular/"   period "/page/" next)]
                    [_ (error 'html-list-page "expected home, new or popular.")]))
   (html-page
-   #:title (~a Name "- Racket Stories")
+   #:title (match Name
+             ["Home" "Racket Stories"]
+             [_      (~a "Racket Stories - Name")])
    #:body
    @main-column{
      @(when message (list @br @message @br))
@@ -740,8 +713,11 @@
   
   (define (entry->table-row e rank)
     (defm (struct* entry ([title the-title] [url the-url] [site site] [score the-score] [id id]
-                                            [submitter-name submitter-name])) e)
-    (def  form-name (~a "arrowform" id))
+                          [submitter submitter] [submitter-name submitter-name])) e)
+    (def cu (current-user))
+    (def show-delete? (and cu (equal? (user-id cu) submitter) (young-entry? e)))
+    (def form-name        (~a "arrowform"  id))
+    (def delete-form-name (~a "deleteform" id))
     @div[class: "entry-row row"
           ; hide rank with `d-none` if needed (element is kept to keep size)
           @span[class: @~a{rank-col  col-auto @(if ranking? "" "d-none")}]{ @(or rank "0") }
@@ -749,7 +725,7 @@
           @(when voting?
              @span[class: "arrow-col col-auto row" 
                @form[class: "arrows" name: form-name action: @~a{vote/@id} method: "post"
-                 @input[name: "arrow" type: "hidden"] 
+                  @input[name: "arrow" type: "hidden"] 
                    @span[class: (~a "updowngrid" (if (show-thumbs-up? id)  "" " hidden"))
                      @(html-a-submit form-name (~a "/vote/up/"   id "/" pn) (html-icon 'thumbs-up))
                      #;(html-a-submit form-name (~a "/vote/down/" id "/" pn) (html-icon 'chevron-down))]]])
@@ -758,7 +734,13 @@
               @span[@a[href: the-url]{ @the-title } " (" @a[class: "from" href: (~a "/from/" id)]{@site} ") "]
               @span[class: "score"]{@the-score points by
                      @span[class: "submitter-name"
-                            @a[href: (~a "/user/" submitter-name) ]{ @submitter-name }]}]]])
+                            @a[href: (~a "/user/" submitter-name) ]{ @submitter-name }]
+                     @(when show-delete?
+                        @span[" | "
+                              @span[class: "delete-link"                                     
+                                @form[class: "delete" name: delete-form-name  method: "post"
+                                  @(html-a-submit #:class "delete"
+                                                  delete-form-name (~a "delete/" id) "delete")]]])}]]])
                                                        
   @span[class: "entries container-fluid"]{
     @(entries->rows entries)})
