@@ -74,7 +74,8 @@
                                      (λ () (hex-string->bytes (read-line))))]
                 [else
                  (displayln "No key in either environment or home. Using default."
-                            (current-error-port))]))]
+                            (current-error-port))
+                 #"A secret key!!!!"]))]
         [else
          (displayln "No key in either environment or home. Using default."
                     (current-error-port))
