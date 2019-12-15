@@ -702,7 +702,8 @@
     (insert-entry (create "Racket Blog" "https://blog.racket-lang.org" 32))
     (insert-entry (create "Blog - Alexis King" "https://lexi-lambda.github.io/index.html" 23))
     (insert-entry (create "Blog - Greg Hendershott" "https://www.greghendershott.com/" 14))
-    (insert-entry (create "Blogs that use Frog" "http://stevenrosenberg.net/racket/2018/03/blogs-that-use-frog.html" 12))))
+    (insert-entry
+     (create "Blogs that use Frog" "http://stevenrosenberg.net/racket/2018/03/blogs-that-use-frog.html" 12))))
 
 (define (populate-github-user)
   (def ht (string->jsexpr

@@ -692,6 +692,19 @@
 
 ;;; List of entries
 
+(define (pluralize n str)
+  (match n
+    [1 str]
+    [_ (~a str "s")]))
+
+(define (plural n str)
+  (~a n " " (pluralize n str)))
+
+(define (minutes->text a)
+  (cond [(> a 1440) (~a (plural (quotient a 1440) "day")     " ago")]
+        [(> a   60) (~a (plural (quotient a   60) "hour")    " ago")]
+        [else       (~a (plural a                  "minute")  " ago")]))
+
 (define (html-list-of-entries page-number first-rank entries
                               #:voting?  [voting?  #f]
                               #:ranking? [ranking? #f]
@@ -718,6 +731,8 @@
     (def show-delete? (and cu (equal? (user-id cu) submitter) (young-entry? e)))
     (def form-name        (~a "arrowform"  id))
     (def delete-form-name (~a "deleteform" id))
+    (define ago  (minutes->text (minutes-between (entry-created-at e) (now))))
+    
     @div[class: "entry-row row"
           ; hide rank with `d-none` if needed (element is kept to keep size)
           @span[class: @~a{rank-col  col-auto @(if ranking? "" "d-none")}]{ @(or rank "0") }
@@ -735,6 +750,7 @@
               @span[class: "score"]{@the-score points by
                      @span[class: "submitter-name"
                             @a[href: (~a "/user/" submitter-name) ]{ @submitter-name }]
+                     @span[class: "ago" " " ago]
                      @(when show-delete?
                         @span[" | "
                               @span[class: "delete-link"                                     
