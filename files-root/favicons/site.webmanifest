@@ -1,19 +1,19 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "Racket Stories",
+    "short_name": "Racket Stories",
     "icons": [
         {
-            "src": "/favicons/android-chrome-192x192.png",
+            "src": "/favicons/android-chrome-192x192.png?v=gAe4a7a45m",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/favicons/android-chrome-256x256.png",
+            "src": "/favicons/android-chrome-256x256.png?v=gAe4a7a45m",
             "sizes": "256x256",
             "type": "image/png"
         }
     ],
-    "theme_color": "#6f42c1",
-    "background_color": "#6f42c1",
+    "theme_color": "#ffffff",
+    "background_color": "#ffffff",
     "display": "standalone"
 }
