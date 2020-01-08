@@ -7,6 +7,7 @@
 ;; 
 
 (provide
+ init-database
  ;; Entry
  (except-out (schema-out entry) make-entry)
  register-entry
@@ -76,6 +77,8 @@
          "authentication.rkt" "database.rkt" "deployment.rkt"
          "parameters.rkt" "user-names.rkt")
 
+(require (for-syntax syntax/parse racket/syntax racket/base))
+
 ;;;
 ;;; Utilities
 ;;;
@@ -95,9 +98,17 @@
 ;;; Database Connection
 ;;;
 
-(define db (connect-to-database))  ; see "database.rkt"
+; (define the-db (connect-to-database))  ; see "database.rkt"
 
-
+; Note: Originally the database connection was stored directly
+;       in a variable `db`, but now a parameter is used.
+;       Therefore the following identifier macro which expands
+;       `db` into `(current-database)` allows not to change existing code.
+(define-syntax (db stx)
+  (syntax-parse stx
+    [_ (syntax/loc stx
+         (current-database))]))
+ 
 ;;;
 ;;; Utilities
 ;;;
@@ -740,15 +751,14 @@ HERE
 
 ; (drop-tables)
 
-
-
-(create-tables)
-
-(match the-deployment
-  [(or (development) (testing))
-   (populate-database)    ; for testing
-   (populate-github-user) ; for testing
-   ]
-  [_ (void)])
+(define (init-database)
+  (create-tables)
+  
+  (match the-deployment
+    [(or (development) (testing))
+     (populate-database)    ; for testing
+     (populate-github-user) ; for testing
+     ]
+    [_ (void)]))
 
 

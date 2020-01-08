@@ -15,7 +15,6 @@
          "config.rkt" "deployment.rkt"
          "parameters.rkt" "structs.rkt")
 
-
 (define (connect-to-database)
   (match (or the-deployment (development))
     [(or (development) (testing)) (if (member (gethostname) '() #;'("mbp"))
@@ -23,15 +22,28 @@
                                       (connect-to-sqlite))]
     [(or (staging) (production))  (connect-to-postgresql)]))
 
+
+; We keep a pool of connections to the database. Reusing connections
+; to database is faster than setting up a new connection each time
+; (and a single connection is fragile).
+
+(define pool #f)
+
 (define (connect-to-sqlite)
-  (sqlite3-connect    #:database sqlite-db
-                      #:mode     'create))
+  (set! pool (or pool
+                 (connection-pool
+                  (λ () (sqlite3-connect    #:database sqlite-db
+                                            #:mode     'create)))))
+  (connection-pool-lease pool))
 
 
 (define (connect-to-postgresql)
-  (postgresql-connect #:database (database-name)
-                      #:password (database-password)
-                      #:user     (database-user)
-                      #:server   (database-server)
-                      #:port     (database-port)
-                      #:ssl      'yes))
+  (set! pool (or pool                 
+                 (connection-pool
+                  (λ () (postgresql-connect #:database (database-name)
+                                            #:password (database-password)
+                                            #:user     (database-user)
+                                            #:server   (database-server)
+                                            #:port     (database-port)
+                                            #:ssl      'yes)))))
+  (connection-pool-lease pool))

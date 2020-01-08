@@ -24,3 +24,4 @@
 
 (define current-banner-message (make-parameter #f))
 
+(define current-database (make-parameter #f))

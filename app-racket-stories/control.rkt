@@ -30,7 +30,8 @@
          net/http-client
          net/uri-codec
          json
-         "def.rkt" "exn.rkt" "parameters.rkt" "structs.rkt"
+         (only-in db disconnect)
+         "database.rkt" "def.rkt" "exn.rkt" "parameters.rkt" "structs.rkt"
          "validation.rkt" 
          "model.rkt" "view.rkt" "secret.rkt")
 
@@ -79,7 +80,6 @@
     [(bytes? v)  v]
     [(string? v) (string->bytes/utf-8 v)]
     [else        (error 'ensure-bytes (~a "got: " v))]))
-
 
 
 
@@ -143,14 +143,17 @@
 ; decides what happens next.
 
 (define (dispatch req)
-  (current-request req)
-  (def token    (get-id-cookie-value req "session-token"))
-  (def session  (get-session token))
-  (def user     (and session (get-user (session-user-id session))))
-  
-  (parameterize ([current-login-status   (and session user #t)] ; todo remove
-                 [current-user           (and session user)])
-    (dispatch-on-url req)))
+  (parameterize ([current-database (connect-to-database)])
+    (current-request req)
+    (def token    (get-id-cookie-value req "session-token"))
+    (def session  (get-session token))
+    (def user     (and session (get-user (session-user-id session))))
+    (parameterize ([current-login-status   (and session user #t)] ; todo remove
+                   [current-user           (and session user)])
+      (begin0
+        (dispatch-on-url req)
+        (disconnect (current-database))))))
+        
 
 ;;; URL Dispatching
 
