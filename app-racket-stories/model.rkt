@@ -740,8 +740,9 @@ HERE
 (define (create-tables)
   ; Note: This creates the tables if they don't exist.
   ;       Nothing is done if they do exist.
-  (for ([s schemas])
-    (create-table! db s)))
+  (parameterize ([current-database (connect-to-database)])
+    (for ([s schemas])
+      (create-table! db s))))
 
 (define (drop-tables)
   (for ([s schemas])    
