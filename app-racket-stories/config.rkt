@@ -38,6 +38,8 @@
 (define-runtime-path sqlite-db "../dbs/racket-stories-sqlite.db")
 ; no user / password
 
+(define-runtime-path sqlite-db-dir "../dbs")
+
 
 ;;; Postgresql
 

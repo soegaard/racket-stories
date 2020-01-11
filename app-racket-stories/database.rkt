@@ -15,6 +15,10 @@
          "config.rkt" "deployment.rkt"
          "parameters.rkt" "structs.rkt")
 
+(unless (directory-exists? sqlite-db-dir)
+  (make-directory sqlite-db-dir))
+
+
 (define (connect-to-database)
   (match (or the-deployment (development))
     [(or (development) (testing)) (if (member (gethostname) '() #;'("mbp"))
