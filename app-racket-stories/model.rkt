@@ -472,11 +472,12 @@
                  (select (count *)))))
 
 (define (create-github-user user-id github-ht)
-  (define (get n [convert values] [default ""])
+  (define (convert x) (if (eq? x 'null) "" x))
+  (define (get n [default ""])
     (convert (hash-ref github-ht n default)))
 
   (def gu (make-github-user #:user-id    user-id
-                            #:github-id  (get 'id values 0)                            
+                            #:github-id  (get 'id 0)
                             #:login      (get 'login)
                             #:real-name  (get 'name)
                             #:email      (get 'email)
