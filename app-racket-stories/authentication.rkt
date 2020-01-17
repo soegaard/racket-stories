@@ -71,8 +71,8 @@
 
 ; The parameters can be tweaked - see the docs for crypto.
 
-(define pbkedf2-params (list (list 'iterations 65536) 
-                             (list 'key-size   64)))
+(define pbkdf2-params (list (list 'iterations 65536) 
+                            #;(list 'key-size   64)))
 
 (define argon2id-params  '((p 2)       ; number of cores
                            (t 256)     ; time cost
@@ -82,7 +82,7 @@
 
 (def params (if (get-kdf kdf-spec-argon2)
                 argon2id-params
-                pbkedf2-params))
+                pbkdf2-params))
 
 ;; Okay - now we have a key derivation implemented.
 ;; Let's derive some keys.
