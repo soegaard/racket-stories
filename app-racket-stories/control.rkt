@@ -327,9 +327,12 @@
   (def result (html-reset-password-sent-page))
   (def ue  (get-binding #"usernameoremail" bytes->string/utf-8))
   (def u   (or (get-user/username ue) (get-user/email ue)))
-  (def t   (new-reset-password-token #:user u))
-  (def url (~a "https://racket-stories.com/password-recovery/" t))
-  (send-reset-password-email (user-email u) (user-username u) url)
+  (when (user? u)
+    ; don't do anything if the username/email is not found
+    ; (we can't reveal which email adresses we have as users)
+    (def t   (new-reset-password-token #:user u))
+    (def url (~a "https://racket-stories.com/password-recovery/" t))
+    (send-reset-password-email (user-email u) (user-username u) url))
   (response/output (λ (out) (display result out))))
 
 (define (do-password-recovery req token)

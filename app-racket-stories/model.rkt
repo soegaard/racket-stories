@@ -807,7 +807,24 @@ HERE
      ]
     [_ (void)]))
 
-
 #;(begin (current-database (connect-to-database))
          (drop-tables)
          (init-database))
+
+;;;
+;;; Schema -> PostGresql SQL
+;;;
+
+; The generates the SQL used to create the table.
+
+;; (require (prefix-in ast: deta/private/ast)
+;;          deta/private/schema
+;;          deta/private/dialect/dialect 
+;;          deta/private/dialect/postgresql)
+;; (let ([s (schema-registry-lookup 'reset-password-token)])
+;;   (displayln (dialect-emit-ddl postgresql-dialect
+;;                                (ast:create-table (schema-table s) (schema-fields s)))))
+
+
+
+   
