@@ -32,7 +32,7 @@
          json
          (only-in db disconnect)
          "database.rkt" "def.rkt" "exn.rkt" "parameters.rkt" "structs.rkt"
-         "validation.rkt" 
+         "validation.rkt" "mail.rkt"
          "model.rkt" "view.rkt" "secret.rkt")
 
 ;;;
@@ -193,6 +193,7 @@
    [("")                                          (λ (req) (do-home req 0))]                 
    [("home")                                      (λ (req) (do-home req 0))]
    [("home" "page" (integer-arg))                 do-home]
+   [("submit")                                    do-submit] ; new entry page
    [("new")                                       (λ (req) (do-new req 0 ))]
    [("new" "page" (integer-arg))                  do-new]
    [("popular")                                   (λ (req) (do-popular req "week" 0))]
@@ -202,8 +203,9 @@
    [("profile")                                   do-profile] ; show own user profile
    [("from" (integer-arg))                        do-from]  ; entries from same site as entry-id
    [("about")                                     do-about]                
-   [("login")                                     do-login/create-account] 
-   [("submit")                                    do-submit]               ; new entry page
+   [("login")                                     do-login/create-account]
+   [("forgot")                                    do-forgot]
+   [("password-recovery" (string-arg))            do-password-recovery]
 
    ; actions
    ;   only recognize up-votes - use the next line if you need both
@@ -220,11 +222,13 @@
    [("associate-github")                          do-associate-github]
 
    ; form submissions
-   [("logout-submitted")         #:method "post"  do-logout-submitted] ; logout, then show front page
-   [("entry-submitted")          #:method "post"  do-entry-submitted]
-   [("login-submitted")          #:method "post"  do-login-submitted]
-   [("create-account-submitted") #:method "post"  do-create-account-submitted]
-   [("profile-submitted")        #:method "post"  do-profile-submitted]
+   [("logout-submitted")              #:method "post"  do-logout-submitted] ; logout, then show front page
+   [("entry-submitted")               #:method "post"  do-entry-submitted]
+   [("login-submitted")               #:method "post"  do-login-submitted]
+   [("create-account-submitted")      #:method "post"  do-create-account-submitted]
+   [("profile-submitted")             #:method "post"  do-profile-submitted]
+   [("send-reset-password-submitted") #:method "post"  do-send-reset-password-submitted] ; send mail
+   [("reset-password-submitted")      #:method "post"  do-reset-password-submitted]      ; actual reset password
 
    [("github-login")                              do-github-login]    ; initiate login (by user)
    [("github-callback")          #:method "post"  do-github-callback] ; callback       (by github)
@@ -314,6 +318,31 @@
 (define (do-associate-github req)
   (parameterize ([current-banner-message "To login with Github, you need to link your accounts."])
     (do-login/create-account req)))
+
+(define (do-forgot req)
+  (def result (html-forgot-page))
+  (response/output (λ (out) (display result out))))
+
+(define (do-send-reset-password-submitted req)
+  (def result (html-reset-password-sent-page))
+  (def ue  (get-binding #"usernameoremail" bytes->string/utf-8))
+  (def u   (or (get-user/username ue) (get-user/email ue)))
+  (def t   (new-reset-password-token #:user u))
+  (def url (~a "https://racket-stories.com/password-recovery/" t))
+  (send-reset-password-email (user-email u) (user-username u) url)
+  (response/output (λ (out) (display result out))))
+
+(define (do-password-recovery req token)
+  ; we get here when the user clicks an reset password link in his mail 
+  (def result (html-password-recovery-page token))
+  (response/output (λ (out) (display result out))))
+
+(define (do-reset-password-submitted req )
+  (def np    (get-binding #"password")) ; bytes
+  (def token (get-binding #"token" bytes->string/utf-8))  
+  (reset-password token np)
+  (def result (html-password-was-reset-page))
+  (response/output (λ (out) (display result out))))
 
 
 (define (do-login/create-account req)

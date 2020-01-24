@@ -15,7 +15,8 @@
 ;      https://lexi-lambda.github.io/envy/envy.html
 
 (provide github-client-id     ; see prefs at github.com
-         github-client-secret 
+         github-client-secret
+         postmark-api-token
          (rename-out [aes-decrypt decrypt])
          (rename-out [aes-encrypt encrypt])) 
 
@@ -100,4 +101,14 @@
    "7e44d624f9048f4812b254c82bf3818075dc95d568c15cd32e38769426914e82b58d49d02db3cf21"))
 
 
+;;;
+;;; Postmark
+;;;
+
+; Postmark is used to send "transactional" emails.
+; To begin with we use it to send "reset password" emails.
+
+(define postmark-api-token
+  (aes-decrypt
+   "7c4e8279fe02dd125bb90ecf2fb88cd27b888fd467c45fce786d24c92492488fbad74a83"))
 

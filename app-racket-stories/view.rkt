@@ -70,7 +70,12 @@
          html-user-page
          html-profile-page
          html-from-page
-         html-associate-github-page)
+         html-associate-github-page
+         ; recovery
+         html-forgot-page
+         html-reset-password-sent-page
+         html-password-recovery-page
+         html-password-was-reset-page)
 
 
 ;; Dependencies
@@ -784,6 +789,7 @@
       @div[class: "row"
         @div[class: "col-sm-6 col-main"
           @nbsp
+
           @h1{Login}
           @form[name: "loginform" action: "/login-submitted" method: "post"]{
             @form-group{
@@ -829,8 +835,11 @@
               @p{To link the accounts: 
                     @ul[@li{login to Racket Stories (with name/password)}
                         @li{go to your profile page (click your username at the top, right)}
-                        @li{click the "Sign in with Github" button}]}]    
+                        @li{click the "Sign in with Github" button}]}
+              @h1[class: "text-center"]{Forgot password?}
+                @a[href: "/forgot"]{I forgot my password}]    
             ]]]))
+
 
 (define (github-button)
   ; (def github-action-url "https://github.com/login/oauth/authorize?client_id=ec150ed77da7c0f796ec")  
@@ -841,7 +850,66 @@
              style: "vertical-align:middle;"]{} 
           @nbsp Sign in with Github}]])
 
+;;;
+;;; Forgot Password Page
+;;;
+
+(define (html-forgot-page)
+  (current-page "login")
+  (html-page
+   #:title "Forgot Password - Racket Stories"
+   #:body
+   @main-column/no-color[
+     @nbsp
+     @h1{Reset Your Password}
+
+     @p{If you can't remember your password, then enter either your username or your email. @(br)
+        We will send an email with further instructions.}
           
+     @form[name: "sendresetpassword" action: "/send-reset-password-submitted" method: "post"]{
+       @form-group{@label[for: "usernameoremail"]{Username or email}
+                   @form-input[name: "usernameoremail" type: "text" value: ""]}            
+       @submit-button{Send reset mail}}]))
+
+(define (html-reset-password-sent-page)
+  (current-page "reset-password-sent")
+  (html-page
+   #:title "Password Reset Sent - Racket Stories"
+   #:body
+   @main-column/no-color[
+          @nbsp
+          @h1{Mail Sent}
+
+          @p{We have sent a mail with further instructions. @(br)
+             If you don't receive it, check you spam folder.}]))
+
+(define (html-password-recovery-page token)
+  (current-page "password-recory")
+  (html-page
+   #:title "Password Recovery - Racket Stories"
+   #:body
+   @main-column/no-color[
+          @nbsp
+          @h1{Reset Password}
+
+          @p{Enter your new password}
+
+          @form[name: "resetpassword" action: "/reset-password-submitted" method: "post"]{
+            @form-group{
+              @label[for: "password"]{Password}
+              @form-input[name: "password" type: "password" value: ""]}
+            @input[type: "hidden" id: "token" name: "token" value: @|token|]
+            @submit-button{Reset Password}}]))
+
+(define (html-password-was-reset-page)
+  (current-page "password-recory")
+  (html-page
+   #:title "Password Was Reset - Racket Stories"
+   #:body
+   @main-column/no-color[
+          @nbsp
+          @h1{Password Was Reset}
+          @p{You can now login with your new password.}]))
 
 ;;;
 ;;; Icons

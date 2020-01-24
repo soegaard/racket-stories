@@ -35,7 +35,9 @@
  get-user
  authenticate-user
  change-user-about
-
+ get-user/email
+ get-user/username
+ 
  ;; Github users and state
  (except-out (schema-out github-user) make-github-user)
  login-github-user
@@ -61,6 +63,10 @@
  ; session-logged-in? 
  session-terminate
  session-user-id
+
+ ;; Password Resets
+ reset-password
+ new-reset-password-token
  )
 
 
@@ -376,6 +382,10 @@
 (define (get-user/username username)
   (lookup db (~> (from user #:as u)
                  (where (= username ,username)))))
+
+(define (get-user/email email)
+  (lookup db (~> (from user #:as u)
+                 (where (= email ,email)))))
 
 (define (username-in-db? username)
   (positive? (lookup db (~> (from user #:as u)
@@ -697,6 +707,41 @@
   (when (session-belongs-to-user? s u)
     (delete! db s)))
 
+;;;
+;;; RESET PASSWORD TOKENS
+;;;
+
+(define-schema reset-password-token
+  ([id              id/f        #:primary-key #:auto-increment]
+   [user-id         id/f]
+   [token           string/f]
+   [expires-at      datetime/f]))
+
+(define (new-reset-password-token #:user u) 
+  (def token (bytes->hex-string (crypto-random-bytes 16)))
+  (def t (make-reset-password-token #:user-id    (user-id u)
+                                    #:token      token
+                                    #:expires-at (+period (now) (period [hours 42]))))
+  (insert-one! db t)
+  token)
+
+(define (get-reset-password-token/token token)
+  (lookup db (~> (from reset-password-token #:as t)
+                 (where (= t.token ,token)))))
+
+
+(define (reset-password-token-expired? reset-password-token)
+  (and reset-password-token
+       (datetime>? (now) (reset-password-token-expires-at reset-password-token))))
+
+(define (reset-password token new-password)
+  (def rpt (get-reset-password-token/token token))
+  (def u   (get-user/id (reset-password-token-user-id rpt)))
+  (when (and rpt u (not (reset-password-token-expired? rpt)))
+    ; token fine, so we can now change the key
+    ; todo: remove the one time token
+    (update-one! db (update-user-key u (lambda (old-key) (derive-key new-password))))))
+
 
 ;;;
 ;;; DATABASE CREATION
@@ -704,7 +749,7 @@
 
 (define (populate-database)
   (when (= (count-users) 0)
-    (create-user "foo" #"foo" "foo@foo.com"))
+    (create-user "foo" #"foo" "jensaxel@soegaard.net"))
   (when (= (count-entries) 0)
     (define (create title url score)
       (create-entry #:title title #:url url #:score score #:submitter 1 #:submitter-name "foo"))
@@ -736,7 +781,7 @@ HERE
 
 
 
-(define schemas '(entry user vote session github-user github-state))
+(define schemas '(entry user vote session github-user github-state reset-password-token))
 
 (define (create-tables)
   ; Note: This creates the tables if they don't exist.
@@ -751,7 +796,6 @@ HERE
       (drop-table! db s))))
 
 
-; (drop-tables)
 
 (define (init-database)
   (create-tables)
@@ -764,3 +808,6 @@ HERE
     [_ (void)]))
 
 
+#;(begin (current-database (connect-to-database))
+         (drop-tables)
+         (init-database))
