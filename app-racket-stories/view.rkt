@@ -884,7 +884,7 @@
              If you don't receive it, check you spam folder.}]))
 
 (define (html-password-recovery-page token)
-  (current-page "password-recory")
+  (current-page "password-recovery")
   (html-page
    #:title "Password Recovery - Racket Stories"
    #:body
@@ -902,7 +902,7 @@
             @submit-button{Reset Password}}]))
 
 (define (html-password-was-reset-page)
-  (current-page "password-recory")
+  (current-page "password-was-reset")
   (html-page
    #:title "Password Was Reset - Racket Stories"
    #:body
