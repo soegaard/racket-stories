@@ -26,7 +26,7 @@
 
 (define (validate-url url)
   (define feedback "Enter an url that starts with http:// or https://")
-  (match (regexp-match #rx"http[s]?://.+" url) ; too permissive?
+  (match (regexp-match #rx"^http[s]?://.+" url) ; too permissive?
     [#f (validation url #t #t feedback)]
     [_  (validation url #t #f "")]))
 
