@@ -29,6 +29,7 @@
          web-server/http/request-structs
          net/http-client
          net/uri-codec
+         (prefix-in he: net/http-easy)
          json
          (only-in db disconnect)
          "database.rkt" "def.rkt" "exn.rkt" "parameters.rkt" "structs.rkt"
@@ -536,6 +537,20 @@
 ;;; do-submit
 ;;;
 
+(define (discord-notification title)
+  (thread
+    (lambda ()
+      (define data
+        (hasheq
+         'content (string-append "New post on http://racket-stories.com \n"
+                                 title)
+         'username "racket-stories"))
+      (define res
+        (he:response-json
+          (he:post discord-notification-webhook
+                  #:json data)))
+      (he:response-close! res))))
+
 (define (do-entry-submitted req)
   (def logged-in? (and (current-user) #t))
   (def u          (current-user))
@@ -567,6 +582,7 @@
            (redirect-to "/resubmission")]
           [else
            (register-entry #:title title #:url url #:user u #:ip ip)
+           (discord-notification title)
            ; to make sure a reload doesn't resubmit, we redirect to the front page
            (redirect-to "/" temporarily)])]
        [else

@@ -17,6 +17,7 @@
 (provide github-client-id     ; see prefs at github.com
          github-client-secret
          postmark-api-token
+         discord-notification-webhook
          (rename-out [aes-decrypt decrypt])
          (rename-out [aes-encrypt encrypt])) 
 
@@ -112,3 +113,13 @@
   (aes-decrypt
    "7c4e8279fe02dd125bb90ecf2fb88cd27b888fd467c45fce786d24c92492488fbad74a83"))
 
+;;;
+;;; Discord
+;;;
+
+; An url to a "webhook" for sending messages to the Discord channel 
+; "Notifications".
+
+(define discord-notification-webhook
+  (aes-decrypt 
+   "2602c631bf0ec50512e91e9e77e7dc9f2fd0cf99318402cc383c75c42a9c11c8ac851b8023b4c524b024b4173e3f6ab9c8c2e057c634bd9c587b2306eef806df249a379b38162564b856009b05de29f5b84c72092e5265ed9ba9a8c3dec727767414bf5ce0a76e4961f2c311248fdd08baaf2af53a25df6447"))
