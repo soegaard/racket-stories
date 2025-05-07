@@ -830,8 +830,10 @@
             @h1[class: "text-center"]{Login with Github}
             
             @p[(github-button)]
-              @p{You can login with Github, if you have linked your Racket Stories
-                 account to your Github account.}
+              @p{
+                @strong{
+                  You can login with Github, if you have linked your Racket Stories
+                  account to your Github account.}}
               @p{To link the accounts: 
                     @ul[@li{login to Racket Stories (with name/password)}
                         @li{go to your profile page (click your username at the top, right)}
